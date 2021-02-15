@@ -1,5 +1,5 @@
 const express = require("express");
-const app = express();
+const app = express(); //app could be named server
 const PORT = 8080;
 
 const urlDatabase = {
@@ -13,6 +13,10 @@ app.get("/", (req, res) => {
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
+});
+
+app.get("/hello", (req, res) => {
+  res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
 app.listen(PORT, () => {
