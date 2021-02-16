@@ -9,10 +9,6 @@ const bodyParser = require("body-parser");
 const morgan = require("morgan");
 app.use(bodyParser.urlencoded({extended: true}));
 
-function generateRandomString() {
-  return Math.random().toString(36).substr(2, 6) //the 6 represents the length of the random string 
-}
-console.log(generateRandomString());
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -41,14 +37,22 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: req.params.longURL };
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_show", templateVars);
 });
 
+function generateRandomString() {
+  return Math.random().toString(36).substr(2, 6) //the 6 represents the length of the random string 
+}
+
 app.post("/urls", (req, res) => {
-  console.log(req.body); //Log the POST request body to the console
-  res.send("All good!"); //the response
-})
+  const shortURL = generateRandomString();
+  const longURL = req.body.longURL;
+  urlDatabase[shortURL] = longURL
+  // console.log(req.body); //Log the POST request body to the console
+  // res.send("All good!"); //the response
+  res.redirect(`/urls/${shortURL}`);
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
