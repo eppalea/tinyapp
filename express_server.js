@@ -2,12 +2,17 @@ const express = require("express");
 const app = express(); //app could be named server
 const PORT = 8080;
 
-app.use(morgan('dev'));
+// app.use(morgan('dev'));
 app.set("view engine", "ejs");
 
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
 app.use(bodyParser.urlencoded({extended: true}));
+
+function generateRandomString() {
+  return Math.random().toString(36).substr(2, 6) //the 6 represents the length of the random string 
+}
+console.log(generateRandomString());
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
