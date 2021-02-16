@@ -41,6 +41,11 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
+})
+
 function generateRandomString() {
   return Math.random().toString(36).substr(2, 6) //the 6 represents the length of the random string 
 }
