@@ -2,9 +2,11 @@ const express = require("express");
 const app = express(); //app could be named server
 const PORT = 8080;
 
+app.use(morgan('dev'));
 app.set("view engine", "ejs");
 
 const bodyParser = require("body-parser");
+const morgan = require("morgan");
 app.use(bodyParser.urlencoded({extended: true}));
 
 const urlDatabase = {
