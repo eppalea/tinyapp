@@ -2,6 +2,9 @@ const express = require("express");
 const app = express(); //app could be named server
 const PORT = 8080;
 
+var cookieParser = require('cookie-parser')
+app.use(cookieParser())
+
 // app.use(morgan('dev'));
 app.set("view engine", "ejs");
 
