@@ -2,7 +2,7 @@ const express = require("express");
 const app = express(); //app could be named server
 const PORT = 8080;
 
-var cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser')
 app.use(cookieParser())
 
 // app.use(morgan('dev'));
@@ -29,6 +29,12 @@ app.get("/", (req, res) => {
 // app.get("/hello", (req, res) => {
 //   res.send("<html><body>Hello <b>World</b></body></html>\n");
 // });
+
+app.post('/login', (req, res) => {
+  // console.log("username is: ", req.body.username);
+  res.cookie("username", req.body.username );
+  res.redirect("/urls");
+});
 
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
