@@ -12,6 +12,23 @@ const bodyParser = require("body-parser");
 // const morgan = require("morgan");
 app.use(bodyParser.urlencoded({extended: true}));
 
+function generateRandomString(length) {
+  return Math.random().toString(36).substr(2, length); //the 6 represents the length of the random string
+}
+
+const userRandomID = generateRandomString(4);
+const users = {
+  "userRandomID1": {
+    id: "userRandomID1",
+    email: "test@nomail.com",
+    password: "smashbanana"
+  },
+  "userRandomID2": {
+    id: "userRandomID2",
+    email: "beach@nomail.com",
+    password: "surfsup"
+  }
+};
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -21,6 +38,20 @@ const urlDatabase = {
 app.get("/", (req, res) => {
   res.send("Aloha!");
 });
+
+app.get("/register", (req, res) => {
+  res.render("register");
+});
+
+app.post("/register", (req, res) => {
+  // console.log("email is:", req.body.email)
+  const userRandomID = generateRandomString(4);
+  users[userRandomID] = { id: userRandomID, email: req.body.email, password: req.body.password }
+  res.cookie("user_id",userRandomID);
+  console.log(users);
+  res.redirect('/urls')
+}); 
+
 
 app.post('/login', (req, res) => {
   console.log("username is: ", req.body.username);
@@ -53,12 +84,8 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
-function generateRandomString() {
-  return Math.random().toString(36).substr(2, 6); //the 6 represents the length of the random string
-}
-
 app.post("/urls", (req, res) => {
-  const shortURL = generateRandomString();
+  const shortURL = generateRandomString(6);
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
   res.redirect(`/urls/${shortURL}`);
