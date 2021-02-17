@@ -2,14 +2,14 @@ const express = require("express");
 const app = express(); //app could be named server
 const PORT = 8080;
 
-const cookieParser = require('cookie-parser')
-app.use(cookieParser())
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
 
 // app.use(morgan('dev'));
 app.set("view engine", "ejs");
 
 const bodyParser = require("body-parser");
-const morgan = require("morgan");
+// const morgan = require("morgan");
 app.use(bodyParser.urlencoded({extended: true}));
 
 
@@ -22,25 +22,16 @@ app.get("/", (req, res) => {
   res.send("Aloha!");
 });
 
-// app.get("/urls.json", (req, res) => {
-//   res.json(urlDatabase);
-// });
-
-// app.get("/hello", (req, res) => {
-//   res.send("<html><body>Hello <b>World</b></body></html>\n");
-// });
-
 app.post('/login', (req, res) => {
   console.log("username is: ", req.body.username);
-  res.cookie("username", req.body.username );
+  res.cookie("username", req.body.username);
   res.redirect("/urls");
 });
 
 app.post('/logout', (req, res) => {
-
-  res.clearCookie("username", { username: req.cookies["username"] })
+  res.clearCookie("username", { username: req.cookies["username"] });
   res.redirect("/urls");
-})
+});
 
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
@@ -78,8 +69,8 @@ app.post("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const updatedlongURL = req.body.longURL;
   urlDatabase[shortURL] = updatedlongURL;
-  res.redirect('/urls')
-})
+  res.redirect('/urls');
+});
 
 
 //DELETE
@@ -87,7 +78,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   // console.log("i want to delete:", req.params.shortURL);
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
-})
+});
 
 
 app.listen(PORT, () => {
