@@ -57,6 +57,15 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
+//UPDATE
+app.post("/urls/:shortURL", (req, res) => {
+  const shortURL = req.params.shortURL;
+  const updatedlongURL = req.body.longURL;
+  urlDatabase[shortURL] = updatedlongURL;
+  res.redirect('/urls')
+})
+
+
 //DELETE
 app.post('/urls/:shortURL/delete', (req, res) => {
   // console.log("i want to delete:", req.params.shortURL);
