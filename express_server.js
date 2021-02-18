@@ -50,7 +50,8 @@ app.get("/register", (req, res) => {
 
 const emailChecker = function(value) {
   for (const user in users) {
-    if (value === users[user].email) {
+    if (value === users[user].email) { 
+      return user
     } if (value === users[user].password) {
       return user;
     }
@@ -89,7 +90,7 @@ app.post('/login', (req, res) => {
     res.status(403).send("Sorry, no dice. That password is incorrect. Please try again.");
   }
   const user = emailChecker(req.body.email);
-  console.log("the login user is: ", user)
+  // console.log("the login user is: ", user)
   res.cookie("user_id", user);
   res.redirect('/urls');
 });
@@ -119,12 +120,12 @@ app.post('/logout', (req, res) => {
 const urlsForUser = function(urlDatabase, id) {
   let userSpecificURLDatabase = {};
   for (const shortURL in urlDatabase) {
-    console.log("the shortURL is: ", shortURL);
-    console.log("the url db userid is: ", urlDatabase[shortURL].userID)
-    console.log("this is id: ", id);
+    // console.log("the shortURL is: ", shortURL);
+    // console.log("the url db userid is: ", urlDatabase[shortURL].userID)
+    // console.log("this is id: ", id);
     if (urlDatabase[shortURL].userID === id) {
       userSpecificURLDatabase[shortURL] = urlDatabase[shortURL]; 
-      console.log("the user specific db key is:" ,userSpecificURLDatabase[shortURL]);
+      // console.log("the user specific db key is:" ,userSpecificURLDatabase[shortURL]);
     }
   }
   return userSpecificURLDatabase;
@@ -132,13 +133,13 @@ const urlsForUser = function(urlDatabase, id) {
 
 app.get("/urls", (req, res) => {
   const user = users[req.cookies["user_id"]];
-  console.log("the user variable is:", user)
-  console.log("the user id value is: ", user.id)
+  // console.log("the user variable is:", user)
+  // console.log("the user id value is: ", user.id)
   if (!user) {
     res.send("Access denied. Please Login or Register use the TinyApp.");
   } else {
     const userSpecificURLDatabase = (urlsForUser(urlDatabase, user.id))
-    console.log("this is userSpecificURLDatabase", userSpecificURLDatabase)
+    // console.log("this is userSpecificURLDatabase", userSpecificURLDatabase)
     const userTemplateVars = {
       urls: userSpecificURLDatabase,
       user: user
@@ -185,6 +186,9 @@ app.post("/urls", (req, res) => {
 //UPDATE
 app.post("/urls/:shortURL", (req, res) => {
   const user = users[req.cookies["user_id"]];
+  const userSpecificURLDatabase = urlsForUser(urlDatabase, user.id);
+  console.log("this is userSpecificURLDatabase", userSpecificURLDatabase);
+
   if (user) {
   const shortURL = req.params.shortURL;
   const updatedlongURL = req.body.longURL;
