@@ -204,9 +204,16 @@ app.post("/urls/:shortURL", (req, res) => {
 //DELETE
 app.post('/urls/:shortURL/delete', (req, res) => {
   const user = users[req.cookies["user_id"]];
-  if (user) {
-    delete urlDatabase[req.params.shortURL];
-    // console.log("i want to delete:", req.params.shortURL);
+  const userSpecificURLDatabase = urlsForUser(urlDatabase, user.id);
+  // console.log("the user is: ", user);
+  // console.log("the user id is: ", user.id);
+  // console.log("this is userSpecificURLDatabase", userSpecificURLDatabase);
+  for (const shortURL in userSpecificURLDatabase) {
+    if (user.id === userSpecificURLDatabase[shortURL].userID) {
+    // console.log("the id in the userSpecificURLDatabase is: ", userSpecificURLDatabase[shortURL].userID);   
+  }
+  delete urlDatabase[req.params.shortURL];
+  // console.log("i want to delete:", req.params.shortURL);
   }
   res.redirect("/urls");
 });
