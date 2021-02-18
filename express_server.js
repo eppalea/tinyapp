@@ -108,15 +108,58 @@ app.post('/logout', (req, res) => {
   res.redirect("/urls");
 });
 
+// const users = {
+//   "userRandomID1": {
+//     id: "userRandomID1",
+//     email: "test@nomail.com",
+//     password: "smashbanana"
+//   },
+//   "userRandomID2": {
+//     id: "userRandomID2",
+//     email: "beach@nomail.com",
+//     password: "surfsup"
+//   }
+// };
+
+// const urlDatabase = {
+//   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID:  "userRandomID1" },
+//   "9sm5xK": { longURL: "http://www.google.com", userID: "userRandomID2" }
+// };
+
+//working here
+const urlsForUser = function(id) {
+  const userSpecificURLs = {};
+  for (const shortURL in urlDatabase) {
+    console.log("the shortURL is: ", shortURL);
+    if (urlDatabase[shortURL].userID === id) {
+    userSpecificURLs[shortURL] = urlDatabase[shortURL]; 
+    console.log(userSpecificURLs[shortURL]);
+    }
+  }
+  return userSpecificURLs;
+};
+
+//working here
 app.get("/urls", (req, res) => {
   const id = req.cookies["user_id"];
   const user = users[id];
   const templateVars = {
     urls: urlDatabase,
-    
     user: user
   };
-  res.render("urls_index", templateVars);
+  if (!user) {
+    res.send("Access denied. Please Login or Register use the TinyApp.");
+    // res.redirect('/login');
+  } else {
+    console.log("the user is", user.id);
+    const userSpecificURLs = (urlsForUser(user.id))
+    const userTemplateVars = {
+      urls: userSpecificURLs,
+      user: user
+    }
+    res.render("urls_index", userTemplateVars);
+  }
+ 
 });
 
 app.get("/urls/new", (req, res) => {
@@ -148,7 +191,8 @@ app.get("/u/:shortURL", (req, res) => {
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString(6);
   const longURL = req.body.longURL;
-  urlDatabase[shortURL].longURL = longURL;
+  urlDatabase[shortURL] = {longURL: req.body.longURL, userID: req.cookies['user_id']};
+  console.log(urlDatabase);
   res.redirect(`/urls/${shortURL}`);
 });
 
