@@ -180,17 +180,25 @@ app.post("/urls", (req, res) => {
 
 //UPDATE
 app.post("/urls/:shortURL", (req, res) => {
+  const id = req.cookies["user_id"];
+  const user = users[id];
+  if (user) {
   const shortURL = req.params.shortURL;
   const updatedlongURL = req.body.longURL;
   urlDatabase[shortURL].longURL = updatedlongURL;
   res.redirect('/urls');
+  }
 });
 
 
 //DELETE
 app.post('/urls/:shortURL/delete', (req, res) => {
-  // console.log("i want to delete:", req.params.shortURL);
-  delete urlDatabase[req.params.shortURL];
+  const id = req.cookies["user_id"];
+  const user = users[id];
+  if (user) {
+    delete urlDatabase[req.params.shortURL];
+    // console.log("i want to delete:", req.params.shortURL);
+  }
   res.redirect("/urls");
 });
 
