@@ -12,11 +12,10 @@ const bodyParser = require("body-parser");
 // const morgan = require("morgan");
 app.use(bodyParser.urlencoded({extended: true}));
 
-function generateRandomString(length) {
-  return Math.random().toString(36).substr(2, length); //the 6 represents the length of the random string
-}
+const generateRandomString = function(length) {
+  return Math.random().toString(36).substr(2, length); //represents the length of the random string
+};
 
-const userRandomID = generateRandomString(4);
 const users = {
   "userRandomID1": {
     id: "userRandomID1",
@@ -45,7 +44,7 @@ app.get("/register", (req, res) => {
   // console.log(user);
   const templateVars = {
     user: user,
-    };
+  };
   res.render("register", templateVars);
 });
 
@@ -63,46 +62,45 @@ app.post("/register", (req, res) => {
   if (!req.body.email) {
     // console.log("email is:", req.body.email)
     res.status(404);
-    res.send("Status 404 - Uh oh, there's a error. Please try again with a valid email!")
-    } else if (emailChecker(req.body.email)) {
-      res.status(404);
-      res.send("Status 404 - Sorry, no dice. That email already exists. Please try again.")
-    } ;
+    res.send("Status 404 - Uh oh, there's a error. Please try again with a valid email!");
+  } else if (emailChecker(req.body.email)) {
+    res.status(404);
+    res.send("Status 404 - Sorry, no dice. That email already exists. Please try again.");
+  }
   const userRandomID = generateRandomString(4);
-  users[userRandomID] = { 
-    id: userRandomID, 
-    email: req.body.email, 
-    password: req.body.password 
+  users[userRandomID] = {
+    id: userRandomID,
+    email: req.body.email,
+    password: req.body.password
   };
   res.cookie("user_id", userRandomID);
-  res.redirect('/urls') 
-}); 
+  res.redirect('/urls');
+});
 
 app.get('/login', (req, res) => {
   const templateVars = {
     user: null,  // this is null because there is no info to be passed into the login template. once the template is filled out, that info is sent to the app.post
-    };
+  };
   res.render("login", templateVars);
 });
 
-//working here
 app.post('/login', (req, res) => {
   if (!emailChecker(req.body.email)) {
     // console.log("email is:", req.body.email)
     res.status(403);
-    res.send("Status 403 - Uh oh, there's a error. Please try again with a valid email!")
-    } else if (!emailChecker(req.body.password)) {
-      res.status(403);
-      res.send("Status 404 - Sorry, no dice. That password is incorrect. Please try again.")
-    } ;
+    res.send("Status 403 - Uh oh, there's a error. Please try again with a valid email!");
+  } else if (!emailChecker(req.body.password)) {
+    res.status(403);
+    res.send("Status 404 - Sorry, no dice. That password is incorrect. Please try again.");
+  }
   const userRandomID = generateRandomString(4);
-  users[userRandomID] = { 
-    id: userRandomID, 
-    email: req.body.email, 
-    password: req.body.password 
+  users[userRandomID] = {
+    id: userRandomID,
+    email: req.body.email,
+    password: req.body.password
   };
   res.cookie("user_id", userRandomID);
-  res.redirect('/urls') 
+  res.redirect('/urls');
 });
 
 app.post('/logout', (req, res) => {
@@ -113,9 +111,9 @@ app.post('/logout', (req, res) => {
 app.get("/urls", (req, res) => {
   const id = req.cookies["user_id"];
   const user = users[id];
-  const templateVars = { 
-    urls: urlDatabase, 
-    user: user,
+  const templateVars = {
+    urls: urlDatabase,
+    user: user
   };
   res.render("urls_index", templateVars);
 });
@@ -130,10 +128,10 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const id = req.cookies["user_id"];
   const user = users[id];
-  const templateVars = { 
-    shortURL: req.params.shortURL, 
-    longURL: urlDatabase[req.params.shortURL], 
-    user: user,
+  const templateVars = {
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[req.params.shortURL],
+    user: user
   };
   res.render("urls_show", templateVars);
 });
