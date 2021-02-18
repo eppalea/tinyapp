@@ -158,6 +158,9 @@ app.get("/urls/:shortURL", (req, res) => {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL,
     user: user
+  }
+  if (!user) {
+    res.send("Access denied. Please Login or Register use the TinyApp.");
   };
   res.render("urls_show", templateVars);
 });
