@@ -42,7 +42,7 @@ app.get("/", (req, res) => {
 app.get("/register", (req, res) => {
   const id = req.cookies["user_id"];
   const user = users[id];
-  console.log(user);
+  // console.log(user);
   const templateVars = {
     user: user,
     };
@@ -76,7 +76,15 @@ app.post("/register", (req, res) => {
   res.redirect('/urls') 
 }); 
 
+//new code
+app.get('/login', (req, res) => {
+  const templateVars = {
+    user: null,  // this is null because there is no info to be passed into the login template. once the template is filled out, that info is sent to the app.post
+    };
+  res.render("login", templateVars);
+});
 
+//this will be change... i think
 app.post('/login', (req, res) => {
   console.log("user is: ", req.body.user);
   res.cookie("user_id", req.body.user);
