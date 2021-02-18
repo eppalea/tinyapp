@@ -108,25 +108,6 @@ app.post('/logout', (req, res) => {
   res.redirect("/urls");
 });
 
-// const users = {
-//   "userRandomID1": {
-//     id: "userRandomID1",
-//     email: "test@nomail.com",
-//     password: "smashbanana"
-//   },
-//   "userRandomID2": {
-//     id: "userRandomID2",
-//     email: "beach@nomail.com",
-//     password: "surfsup"
-//   }
-// };
-
-// const urlDatabase = {
-//   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID:  "userRandomID1" },
-//   "9sm5xK": { longURL: "http://www.google.com", userID: "userRandomID2" }
-// };
-
-//working here
 const urlsForUser = function(id) {
   const userSpecificURLDatabase = {};
   for (const shortURL in urlDatabase) {
@@ -139,7 +120,6 @@ const urlsForUser = function(id) {
   return userSpecificURLDatabase;
 };
 
-//working here
 app.get("/urls", (req, res) => {
   const id = req.cookies["user_id"];
   const user = users[id];
@@ -149,7 +129,6 @@ app.get("/urls", (req, res) => {
   };
   if (!user) {
     res.send("Access denied. Please Login or Register use the TinyApp.");
-    // res.redirect('/login');
   } else {
     console.log("the user is", user.id);
     const userSpecificURLDatabase = (urlsForUser(user.id))
