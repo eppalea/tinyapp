@@ -49,9 +49,11 @@ app.get("/register", (req, res) => {
   res.render("register", templateVars);
 });
 
-const emailChecker = function(email) {
+const emailChecker = function(value) {
   for (const user in users) {
-    if (email === users[user].email) {
+    if (value === users[user].email) {
+      return user;
+    } else if (value === users[user].password) {
       return user;
     }
   }
@@ -76,7 +78,6 @@ app.post("/register", (req, res) => {
   res.redirect('/urls') 
 }); 
 
-//new code
 app.get('/login', (req, res) => {
   const templateVars = {
     user: null,  // this is null because there is no info to be passed into the login template. once the template is filled out, that info is sent to the app.post
@@ -84,11 +85,24 @@ app.get('/login', (req, res) => {
   res.render("login", templateVars);
 });
 
-//this will be change... i think
+//working here
 app.post('/login', (req, res) => {
-  console.log("user is: ", req.body.user);
-  res.cookie("user_id", req.body.user);
-  res.redirect("/urls");
+  if (!emailChecker(req.body.email)) {
+    // console.log("email is:", req.body.email)
+    res.status(403);
+    res.send("Status 403 - Uh oh, there's a error. Please try again with a valid email!")
+    } else if (!emailChecker(req.body.password)) {
+      res.status(403);
+      res.send("Status 404 - Sorry, no dice. That password is incorrect. Please try again.")
+    } ;
+  const userRandomID = generateRandomString(4);
+  users[userRandomID] = { 
+    id: userRandomID, 
+    email: req.body.email, 
+    password: req.body.password 
+  };
+  res.cookie("user_id", userRandomID);
+  res.redirect('/urls') 
 });
 
 app.post('/logout', (req, res) => {
