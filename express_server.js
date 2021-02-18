@@ -68,14 +68,7 @@ app.post("/register", (req, res) => {
   }
   const userRandomID = generateRandomString(4);
   const plainTextPassword = req.body.password;
-  // let salt = bcrypt.genSaltSync(10);
   let hash = bcrypt.hashSync(plainTextPassword, 10);
-  // bcrypt.genSalt(10, (err, salt) => {
-  //   console.log("salt is:", salt);
-  //   bcrypt.hash(plainTextPassword, 10, (err, hash) => {
-      // console.log("the hash is:", hash);
-  //   });
-  // });
   users[userRandomID] = {
     id: userRandomID,
     email: req.body.email,
