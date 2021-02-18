@@ -49,8 +49,23 @@ app.get("/register", (req, res) => {
   res.render("register", templateVars);
 });
 
-app.post("/register", (req, res) => {
+const emailChecker = function(email) {
+  for (const user in users) {
+    if (email === users[user].email) {
+      return user;
+    }
+  }
+};
 
+app.post("/register", (req, res) => {
+  if (!req.body.email) {
+    // console.log("email is:", req.body.email)
+    res.status(404);
+    res.send("Status 404 - Uh oh, there's a error. Please try again with a valid email!")
+    } else if (emailChecker(req.body.email)) {
+      res.status(404);
+      res.send("Status 404 - Sorry, no dice. That email already exists. Please try again.")
+    } ;
   const userRandomID = generateRandomString(4);
   users[userRandomID] = { 
     id: userRandomID, 
@@ -58,7 +73,7 @@ app.post("/register", (req, res) => {
     password: req.body.password 
   };
   res.cookie("user_id", userRandomID);
-  res.redirect('/urls')
+  res.redirect('/urls') 
 }); 
 
 
