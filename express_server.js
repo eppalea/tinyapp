@@ -187,14 +187,17 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:shortURL", (req, res) => {
   const user = users[req.cookies["user_id"]];
   const userSpecificURLDatabase = urlsForUser(urlDatabase, user.id);
-  console.log("this is userSpecificURLDatabase", userSpecificURLDatabase);
-
-  if (user) {
+  // console.log("the user is: ", user);
+  // console.log("the user id is: ", user.id);
+  // console.log("this is userSpecificURLDatabase", userSpecificURLDatabase);
+  for (const shortURL in userSpecificURLDatabase) {
+    if (user.id === userSpecificURLDatabase[shortURL].userID)
+    console.log("the id i÷n the userSpecificURLDatabase is: ", userSpecificURLDatabase[shortURL].userID);   
+  }
   const shortURL = req.params.shortURL;
   const updatedlongURL = req.body.longURL;
   urlDatabase[shortURL].longURL = updatedlongURL;
-  res.redirect('/urls');
-  }
+  res.redirect('/urls');  
 });
 
 
