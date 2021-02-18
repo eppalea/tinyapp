@@ -128,15 +128,15 @@ app.post('/logout', (req, res) => {
 
 //working here
 const urlsForUser = function(id) {
-  const userSpecificURLs = {};
+  const userSpecificURLDatabase = {};
   for (const shortURL in urlDatabase) {
     console.log("the shortURL is: ", shortURL);
     if (urlDatabase[shortURL].userID === id) {
-    userSpecificURLs[shortURL] = urlDatabase[shortURL]; 
-    console.log(userSpecificURLs[shortURL]);
+    userSpecificURLDatabase[shortURL] = urlDatabase[shortURL]; 
+    console.log(userSpecificURLDatabase[shortURL]);
     }
   }
-  return userSpecificURLs;
+  return userSpecificURLDatabase;
 };
 
 //working here
@@ -152,9 +152,9 @@ app.get("/urls", (req, res) => {
     // res.redirect('/login');
   } else {
     console.log("the user is", user.id);
-    const userSpecificURLs = (urlsForUser(user.id))
+    const userSpecificURLDatabase = (urlsForUser(user.id))
     const userTemplateVars = {
-      urls: userSpecificURLs,
+      urls: userSpecificURLDatabase,
       user: user
     }
     res.render("urls_index", userTemplateVars);
