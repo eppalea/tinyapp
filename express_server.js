@@ -92,12 +92,9 @@ app.post('/login', (req, res) => {
     // console.log("email is:", req.body.email)
     res.status(403).send("Uh oh, there's a error. Please try again with a valid email!");
   } 
-
-  // if (!emailChecker(req.body.password)) {
-    
-    const user = emailChecker(req.body.email);
-    console.log("the user's password is:", user.password);
-    if (!bcrypt.compareSync(req.body.password, user.password)) {
+  const user = emailChecker(req.body.email);
+  // console.log("the user's password is:", user.password);
+  if (!bcrypt.compareSync(req.body.password, user.password)) {
     res.status(403).send("Sorry, no dice. That password is incorrect. Please try again.");
   }
   // console.log("the login user is: ", user)
