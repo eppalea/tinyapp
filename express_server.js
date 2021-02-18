@@ -10,6 +10,7 @@ app.set("view engine", "ejs");
 
 const bodyParser = require("body-parser");
 // const morgan = require("morgan");
+const bcrypt = require('bcryptjs');
 app.use(bodyParser.urlencoded({extended: true}));
 
 const generateRandomString = function(length) {
@@ -35,7 +36,7 @@ const urlDatabase = {
 };
 
 app.get("/", (req, res) => {
-  res.send("Aloha!");
+  res.redirect("/register")
 });
 
 app.get("/register", (req, res) => {
@@ -50,26 +51,37 @@ app.get("/register", (req, res) => {
 const emailChecker = function(value) {
   for (const user in users) {
     if (value === users[user].email) {
-      return user;
-    } if (value === users[user].password) {
-      return user;
-    }
+      return users[user];
+    } 
   }
+  return false;
 };
+
 
 app.post("/register", (req, res) => {
   if (!req.body.email) {
     // console.log("email is:", req.body.email)
     res.status(404).send("Uh oh, there's a error. Please try again with a valid email!");
-  } else if (emailChecker(req.body.email)) {
+  } 
+  if (emailChecker(req.body.email)) {
     res.status(404).send("Sorry, no dice. That email already exists. Please try again.");
   }
   const userRandomID = generateRandomString(4);
+  const plainTextPassword = req.body.password;
+  // let salt = bcrypt.genSaltSync(10);
+  let hash = bcrypt.hashSync(plainTextPassword, 10);
+  // bcrypt.genSalt(10, (err, salt) => {
+  //   console.log("salt is:", salt);
+  //   bcrypt.hash(plainTextPassword, 10, (err, hash) => {
+      // console.log("the hash is:", hash);
+  //   });
+  // });
   users[userRandomID] = {
     id: userRandomID,
     email: req.body.email,
-    password: req.body.password
+    password: hash
   };
+  console.log("the users:", users);
   res.cookie("user_id", userRandomID);
   res.redirect('/urls');
 });
@@ -81,16 +93,22 @@ app.get('/login', (req, res) => {
   res.render("login", templateVars);
 });
 
+
 app.post('/login', (req, res) => {
   if (!emailChecker(req.body.email)) {
     // console.log("email is:", req.body.email)
     res.status(403).send("Uh oh, there's a error. Please try again with a valid email!");
-  } else if (!emailChecker(req.body.password)) {
+  } 
+
+  // if (!emailChecker(req.body.password)) {
+    
+    const user = emailChecker(req.body.email);
+    console.log("the user's password is:", user.password);
+    if (!bcrypt.compareSync(req.body.password, user.password)) {
     res.status(403).send("Sorry, no dice. That password is incorrect. Please try again.");
   }
-  const user = emailChecker(req.body.email);
   // console.log("the login user is: ", user)
-  res.cookie("user_id", user);
+  res.cookie("user_id", user.id);
   res.redirect('/urls');
 });
 
