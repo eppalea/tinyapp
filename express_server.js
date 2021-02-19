@@ -32,8 +32,8 @@ app.get("/", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  const user = users[req.cookies["user_id"]];
-  // console.log("the user is: ", user);
+  const user = users[req.session["user_id"]];
+  console.log("the user is: ", user);
   const templateVars = {
     user: user,
   };
@@ -67,7 +67,7 @@ app.post("/register", (req, res) => {
     password: hash
   };
   console.log("the users:", users);
-  res.cookie("user_id", userRandomID);
+  req.session.user_id = userRandomID;
   res.redirect('/urls');
 });
 
@@ -90,7 +90,7 @@ app.post('/login', (req, res) => {
     res.status(403).send("Sorry, no dice. That password is incorrect. Please try again.");
   }
   // console.log("the login user is: ", user)
-  res.cookie("user_id", user.id);
+  req.session.user_id = user.id;
   res.redirect('/urls');
 });
 
@@ -114,7 +114,7 @@ const urlsForUser = function(urlDatabase, id) {
 };
 
 app.get("/urls", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session["user_id"]];
   // console.log("the user variable is:", user)
   // console.log("the user id value is: ", user.id)
   if (!user) {
@@ -131,7 +131,7 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session["user_id"]];
   const templateVars = { user: user,};
   if (!user) {
     res.redirect('/login');
@@ -140,7 +140,7 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session["user_id"]];
   const templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL,
@@ -160,14 +160,14 @@ app.get("/u/:shortURL", (req, res) => {
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString(6);
   // const longURL = req.body.longURL;
-  urlDatabase[shortURL] = {longURL: req.body.longURL, userID: req.cookies['user_id']};
+  urlDatabase[shortURL] = {longURL: req.body.longURL, userID: req.session["user_id"]};
   // console.log(urlDatabase);
   res.redirect(`/urls/${shortURL}`);
 });
 
 //UPDATE
 app.post("/urls/:shortURL", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session["user_id"]];
   const userSpecificURLDatabase = urlsForUser(urlDatabase, user.id);
   // console.log("the user is: ", user);
   // console.log("the user id is: ", user.id);
@@ -185,7 +185,7 @@ app.post("/urls/:shortURL", (req, res) => {
 
 //DELETE
 app.post('/urls/:shortURL/delete', (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session["user_id"]];
   const userSpecificURLDatabase = urlsForUser(urlDatabase, user.id);
   // console.log("the user is: ", user);
   // console.log("the user id is: ", user.id);
