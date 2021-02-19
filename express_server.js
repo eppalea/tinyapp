@@ -1,8 +1,8 @@
 const express = require("express");
-const app = express(); //app could be named server
+const app = express();
 const PORT = 8080;
 
-const { emailChecker } = require('./helpers');
+const { emailChecker, urlsForUser } = require('./helpers');
 
 const cookieSession = require('cookie-session');
 app.use(cookieSession({
@@ -10,30 +10,17 @@ app.use(cookieSession({
   keys: ['any', 'values'],
 }));
 
-// app.use(morgan('dev'));
 app.set("view engine", "ejs");
 
 const bodyParser = require("body-parser");
-// const morgan = require("morgan");
 const bcrypt = require('bcryptjs');
 app.use(bodyParser.urlencoded({extended: true}));
 
 const generateRandomString = function(length) {
-  return Math.random().toString(36).substr(2, length); //represents the length of the random string
+  return Math.random().toString(36).substr(2, length);
 };
 
-const users = {
-  // "userRandomID1": {
-  //   id: "userRandomID1",
-  //   email: "test@nomail.com",
-  //   password: "smashbanana"
-  // },
-  // "userRandomID2": {
-  //   id: "userRandomID2",
-  //   email: "beach@nomail.com",
-  //   password: "surfsup"
-  // }
-};
+const users = {};
 
 const urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID:  "userRandomID1" },
@@ -46,7 +33,6 @@ app.get("/", (req, res) => {
 
 app.get("/register", (req, res) => {
   const user = users[req.session["user_id"]];
-  // console.log("the user is: ", user);
   const templateVars = {
     user: user,
   };
@@ -55,7 +41,6 @@ app.get("/register", (req, res) => {
 
 app.post("/register", (req, res) => {
   if (!req.body.email) {
-    // console.log("email is:", req.body.email)
     res.status(404).send("Uh oh, there's a error. Please try again with a valid email or password!");
     return;
   }
@@ -71,32 +56,27 @@ app.post("/register", (req, res) => {
     email: req.body.email,
     password: hash
   };
-  // console.log("the users:", users);
-  // console.log("req.session userRandomID is: ", userRandomID);
   req.session.user_id = userRandomID;
   res.redirect('/urls');
 });
 
 app.get('/login', (req, res) => {
   const templateVars = {
-    user: null,  // this is null because there is no info to be passed into the login template. once the template is filled out, that info is sent to the app.post
+    user: null,
   };
   res.render("login", templateVars);
 });
 
 app.post('/login', (req, res) => {
   if (!emailChecker(req.body.email, users)) {
-    // console.log("email is:", req.body.email)
     res.status(403).send("Uh oh, there's a error. Please try again with a valid email!");
     return;
   }
   const user = emailChecker(req.body.email, users);
-  // console.log("the user's password is:", user.password);
   if (!bcrypt.compareSync(req.body.password, user.password)) {
     res.status(403).send("Sorry, no dice. That password is incorrect. Please try again.");
     return;
   }
-  // console.log("the login user is: ", user)
   req.session.user_id = user.id;
   res.redirect('/urls');
 });
@@ -105,21 +85,6 @@ app.post('/logout', (req, res) => {
   req.session = null;
   res.redirect("/urls");
 });
-
-const urlsForUser = function(urlDatabase, id) {
-  let userSpecificURLDatabase = {};
-  console.log("the urlDatabase is: ", urlDatabase);
-  for (const shortURL in urlDatabase) {
-    // console.log("the shortURL is: ", shortURL);
-    // console.log("the url db userid is: ", urlDatabase[shortURL].userID)
-    // console.log("this is id: ", id);
-    if (urlDatabase[shortURL].userID === id) {
-      userSpecificURLDatabase[shortURL] = urlDatabase[shortURL];
-      // console.log("the user specific db key is:" ,userSpecificURLDatabase[shortURL]);
-    }
-  }
-  return userSpecificURLDatabase;
-};
 
 app.get("/urls", (req, res) => {
   const user = users[req.session["user_id"]];
