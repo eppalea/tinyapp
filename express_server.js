@@ -42,8 +42,8 @@ app.get("/register", (req, res) => {
 
 
 app.post("/register", (req, res) => {
-  if (!req.body.email) {
-    res.status(404).send("Please try again with a valid email!");
+  if (!req.body.email || !req.body.password) {
+    res.status(404).send("Please try again with a valid email or password!");
     return;
   }
   if (emailChecker(req.body.email, users)) {
@@ -143,6 +143,11 @@ app.get("/u/:shortURL", (req, res) => {
 
 
 app.post("/urls", (req, res) => {
+  const user = users[req.session["user_id"]];
+  if (!user) {
+    res.send("Access denied to this shortURL page. Please Login or Register use the TinyApp.");
+    return;
+  }
   const shortURL = generateRandomString(6);
   urlDatabase[shortURL] = {longURL: req.body.longURL, userID: req.session["user_id"]};
   res.redirect(`/urls/${shortURL}`);
