@@ -2,6 +2,8 @@ const express = require("express");
 const app = express(); //app could be named server
 const PORT = 8080;
 
+const emailChecker = require('./helpers');
+
 const cookieSession = require('cookie-session');
 app.use(cookieSession({
   name: 'session',
@@ -33,22 +35,12 @@ app.get("/", (req, res) => {
 
 app.get("/register", (req, res) => {
   const user = users[req.session["user_id"]];
-  console.log("the user is: ", user);
+  // console.log("the user is: ", user);
   const templateVars = {
     user: user,
   };
   res.render("register", templateVars);
 });
-
-const emailChecker = function(value) {
-  for (const user in users) {
-    if (value === users[user].email) {
-      return users[user];
-    } 
-  }
-  return false;
-};
-
 
 app.post("/register", (req, res) => {
   if (!req.body.email) {
@@ -66,7 +58,7 @@ app.post("/register", (req, res) => {
     email: req.body.email,
     password: hash
   };
-  console.log("the users:", users);
+  // console.log("the users:", users);
   req.session.user_id = userRandomID;
   res.redirect('/urls');
 });
@@ -77,7 +69,6 @@ app.get('/login', (req, res) => {
   };
   res.render("login", templateVars);
 });
-
 
 app.post('/login', (req, res) => {
   if (!emailChecker(req.body.email)) {
@@ -118,16 +109,15 @@ app.get("/urls", (req, res) => {
   // console.log("the user variable is:", user)
   // console.log("the user id value is: ", user.id)
   if (!user) {
-    res.send("Access denied. Please Login or Register use the TinyApp.");
-  } else {
-    const userSpecificURLDatabase = (urlsForUser(urlDatabase, user.id));
-    // console.log("this is userSpecificURLDatabase", userSpecificURLDatabase)
-    const userTemplateVars = {
-      urls: userSpecificURLDatabase,
-      user: user
-    };
-    res.render("urls_index", userTemplateVars);
+    res.send("Access denied to the URLs page. Please Login or Register use the TinyApp.");
   }
+  const userSpecificURLDatabase = (urlsForUser(urlDatabase, user.id));
+  // console.log("this is userSpecificURLDatabase", userSpecificURLDatabase)
+  const userTemplateVars = {
+    urls: userSpecificURLDatabase,
+    user: user
+  };
+  res.render("urls_index", userTemplateVars);
 });
 
 app.get("/urls/new", (req, res) => {
@@ -137,6 +127,7 @@ app.get("/urls/new", (req, res) => {
     res.redirect('/login');
   }
   res.render("urls_new", templateVars);
+  // res.redirect
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -147,7 +138,7 @@ app.get("/urls/:shortURL", (req, res) => {
     user: user
   };
   if (!user) {
-    res.send("Access denied. Please Login or Register use the TinyApp.");
+    res.send("Access denied to this shortURL page. Please Login or Register use the TinyApp.");
   }
   res.render("urls_show", templateVars);
 });
