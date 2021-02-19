@@ -28,7 +28,7 @@ const urlDatabase = {
 };
 
 app.get("/", (req, res) => {
-  res.redirect("/register");
+  res.redirect("/login");
 });
 
 app.get("/register", (req, res) => {
@@ -41,7 +41,7 @@ app.get("/register", (req, res) => {
 
 app.post("/register", (req, res) => {
   if (!req.body.email) {
-    res.status(404).send("Uh oh, there's a error. Please try again with a valid email or password!");
+    res.status(404).send("Please try again with a valid email!");
     return;
   }
   if (emailChecker(req.body.email, users)) {
@@ -109,28 +109,21 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-//THIS NEEDS FIXING
 app.get("/urls/:shortURL", (req, res) => {
   const user = users[req.session["user_id"]];
-  const userSpecificURLDatabase = urlsForUser(urlDatabase, user.id);
-  console.log("the user is: ", user);
-  console.log("the user id is: ", user.id);
-  console.log("this is userSpecificURLDatabase", userSpecificURLDatabase);
-  for (const shortURL in userSpecificURLDatabase) {
-    if (user.id === userSpecificURLDatabase[shortURL].userID) {
-      console.log("the id in the userSpecificURLDatabase is: ", userSpecificURLDatabase[shortURL].userID);
-      const templateVars = {
-        shortURL: req.params.shortURL,
-        longURL: urlDatabase[req.params.shortURL].longURL,
-        user: user
-      };
-      res.render("urls_show", templateVars);
-      if (!user.id === userSpecificURLDatabase[shortURL].userID) {
-        res.send("Access denied to this shortURL page. Please Login or Register use the TinyApp.");
-        return;
-      }
-    }
+  if (!user) {
+    res.send("Access denied to this shortURL page. Please Login or Register use the TinyApp.");
+    return;
   }
+  if (user.id !== urlDatabase[req.params.shortURL].userID) {
+    res.send("Access denied. You don't own this shortURL.")
+  }
+  const templateVars = {
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[req.params.shortURL].longURL,
+    user: user
+  };
+  res.render("urls_show", templateVars);  
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -144,38 +137,33 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
+//THIS NEEDS FIXING
 //UPDATE
 app.post("/urls/:shortURL", (req, res) => {
   const user = users[req.session["user_id"]];
   const userSpecificURLDatabase = urlsForUser(urlDatabase, user.id);
-  // console.log("the user is: ", user);
-  // console.log("the user id is: ", user.id);
-  // console.log("this is userSpecificURLDatabase", userSpecificURLDatabase);
-  for (const shortURL in userSpecificURLDatabase) {
-    if (user.id === userSpecificURLDatabase[shortURL].userID) {
+  // console.log("the id in the userSpecificURLDatabase is: ", userSpecificURLDatabase[shortURL].userID);
       const shortURL = req.params.shortURL;
       // console.log("shortURL is ", shortURL);
       const updatedlongURL = req.body.longURL;
       urlDatabase[shortURL].longURL = updatedlongURL;
-      // console.log("the id in the userSpecificURLDatabase is: ", userSpecificURLDatabase[shortURL].userID);
       res.redirect('/urls');
-    }
-  }
+    
+  
 });
 
+//THIS NEEDS FIXING
 //DELETE
 app.post('/urls/:shortURL/delete', (req, res) => {
   const user = users[req.session["user_id"]];
   const userSpecificURLDatabase = urlsForUser(urlDatabase, user.id);
-  // console.log("the user is: ", user);
-  // console.log("the user id is: ", user.id);
-  // console.log("this is userSpecificURLDatabase", userSpecificURLDatabase);
-  for (const shortURL in userSpecificURLDatabase) {
-    if (user.id === userSpecificURLDatabase[shortURL].userID) {
-    // console.log("the id in the userSpecificURLDatabase is: ", userSpecificURLDatabase[shortURL].userID);
-    }
+  // console.log("the id in the userSpecificURLDatabase is: ", userSpecificURLDatabase[shortURL].userID);
+
+    // if (user.id === userSpecificURLDatabase[shortURL].userID) {
+    // }
     delete urlDatabase[req.params.shortURL];
-  }
+    // console.log("the urlDatabase is: ", urlDatabase)
+
   res.redirect("/urls");
 });
 
