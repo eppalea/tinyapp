@@ -22,7 +22,18 @@ const generateRandomString = function(length) {
   return Math.random().toString(36).substr(2, length); //represents the length of the random string
 };
 
-const users = {};
+const users = {
+  "userRandomID1": {
+    id: "userRandomID1",
+    email: "test@nomail.com",
+    password: "smashbanana"
+  },
+  "userRandomID2": {
+    id: "userRandomID2",
+    email: "beach@nomail.com",
+    password: "surfsup"
+  }
+};
 
 const urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID:  "userRandomID1" },
