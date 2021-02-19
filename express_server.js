@@ -141,15 +141,17 @@ app.post("/urls", (req, res) => {
 //UPDATE
 app.post("/urls/:shortURL", (req, res) => {
   const user = users[req.session["user_id"]];
-  const userSpecificURLDatabase = urlsForUser(urlDatabase, user.id);
-  // console.log("the id in the userSpecificURLDatabase is: ", userSpecificURLDatabase[shortURL].userID);
-      const shortURL = req.params.shortURL;
-      // console.log("shortURL is ", shortURL);
-      const updatedlongURL = req.body.longURL;
-      urlDatabase[shortURL].longURL = updatedlongURL;
-      res.redirect('/urls');
-    
-  
+  if (!user) {
+    res.send("Access denied to this shortURL page. Please Login or Register use the TinyApp.");
+    return;
+  }
+  if (user.id !== urlDatabase[req.params.shortURL].userID) {
+    res.send("Access denied. You don't own this shortURL.")
+  }
+  const shortURL = req.params.shortURL;
+  const updatedlongURL = req.body.longURL;
+  urlDatabase[shortURL].longURL = updatedlongURL;
+  res.redirect('/urls');  
 });
 
 //THIS NEEDS FIXING
