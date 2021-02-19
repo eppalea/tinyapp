@@ -8,4 +8,4 @@ const emailChecker = function(email, database) {
   }
 };
 
-module.exports = { emailChecker }
+module.exports = { emailChecker };
