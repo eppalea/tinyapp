@@ -137,7 +137,7 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
-//THIS NEEDS FIXING
+
 //UPDATE
 app.post("/urls/:shortURL", (req, res) => {
   const user = users[req.session["user_id"]];
@@ -154,18 +154,18 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect('/urls');  
 });
 
-//THIS NEEDS FIXING
+
 //DELETE
 app.post('/urls/:shortURL/delete', (req, res) => {
   const user = users[req.session["user_id"]];
-  const userSpecificURLDatabase = urlsForUser(urlDatabase, user.id);
-  // console.log("the id in the userSpecificURLDatabase is: ", userSpecificURLDatabase[shortURL].userID);
-
-    // if (user.id === userSpecificURLDatabase[shortURL].userID) {
-    // }
-    delete urlDatabase[req.params.shortURL];
-    // console.log("the urlDatabase is: ", urlDatabase)
-
+  if (!user) {
+    res.send("Access denied to this shortURL page. Please Login or Register use the TinyApp.");
+    return;
+  }
+  if (user.id !== urlDatabase[req.params.shortURL].userID) {
+    res.send("Access denied. You don't own this shortURL.")
+  }
+  delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
 });
 
