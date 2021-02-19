@@ -88,14 +88,11 @@ app.post('/logout', (req, res) => {
 
 app.get("/urls", (req, res) => {
   const user = users[req.session["user_id"]];
-  // console.log("the user variable is:", user)
-  // console.log("the user id value is: ", user.id)
   if (!user) {
     res.send("Access denied to the URLs page. Please Login or Register use the TinyApp.");
     return;
   }
   const userSpecificURLDatabase = (urlsForUser(urlDatabase, user.id));
-  // console.log("this is userSpecificURLDatabase", userSpecificURLDatabase)
   const userTemplateVars = {
     urls: userSpecificURLDatabase,
     user: user
@@ -110,20 +107,30 @@ app.get("/urls/new", (req, res) => {
     res.redirect('/login');
   }
   res.render("urls_new", templateVars);
-  // res.redirect
 });
 
+//THIS NEEDS FIXING
 app.get("/urls/:shortURL", (req, res) => {
   const user = users[req.session["user_id"]];
-  const templateVars = {
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL].longURL,
-    user: user
-  };
-  if (!user) {
-    res.send("Access denied to this shortURL page. Please Login or Register use the TinyApp.");
+  const userSpecificURLDatabase = urlsForUser(urlDatabase, user.id);
+  console.log("the user is: ", user);
+  console.log("the user id is: ", user.id);
+  console.log("this is userSpecificURLDatabase", userSpecificURLDatabase);
+  for (const shortURL in userSpecificURLDatabase) {
+    if (user.id === userSpecificURLDatabase[shortURL].userID) {
+      console.log("the id in the userSpecificURLDatabase is: ", userSpecificURLDatabase[shortURL].userID);
+      const templateVars = {
+        shortURL: req.params.shortURL,
+        longURL: urlDatabase[req.params.shortURL].longURL,
+        user: user
+      };
+      res.render("urls_show", templateVars);
+      if (!user.id === userSpecificURLDatabase[shortURL].userID) {
+        res.send("Access denied to this shortURL page. Please Login or Register use the TinyApp.");
+        return;
+      }
+    }
   }
-  res.render("urls_show", templateVars);
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -133,9 +140,7 @@ app.get("/u/:shortURL", (req, res) => {
 
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString(6);
-  // const longURL = req.body.longURL;
   urlDatabase[shortURL] = {longURL: req.body.longURL, userID: req.session["user_id"]};
-  // console.log(urlDatabase);
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -158,7 +163,6 @@ app.post("/urls/:shortURL", (req, res) => {
   }
 });
 
-
 //DELETE
 app.post('/urls/:shortURL/delete', (req, res) => {
   const user = users[req.session["user_id"]];
@@ -171,7 +175,6 @@ app.post('/urls/:shortURL/delete', (req, res) => {
     // console.log("the id in the userSpecificURLDatabase is: ", userSpecificURLDatabase[shortURL].userID);
     }
     delete urlDatabase[req.params.shortURL];
-  // console.log("i want to delete:", req.params.shortURL);
   }
   res.redirect("/urls");
 });
