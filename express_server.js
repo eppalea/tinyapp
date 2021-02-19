@@ -23,16 +23,16 @@ const generateRandomString = function(length) {
 };
 
 const users = {
-  "userRandomID1": {
-    id: "userRandomID1",
-    email: "test@nomail.com",
-    password: "smashbanana"
-  },
-  "userRandomID2": {
-    id: "userRandomID2",
-    email: "beach@nomail.com",
-    password: "surfsup"
-  }
+  // "userRandomID1": {
+  //   id: "userRandomID1",
+  //   email: "test@nomail.com",
+  //   password: "smashbanana"
+  // },
+  // "userRandomID2": {
+  //   id: "userRandomID2",
+  //   email: "beach@nomail.com",
+  //   password: "surfsup"
+  // }
 };
 
 const urlDatabase = {
@@ -57,9 +57,11 @@ app.post("/register", (req, res) => {
   if (!req.body.email) {
     // console.log("email is:", req.body.email)
     res.status(404).send("Uh oh, there's a error. Please try again with a valid email!");
+    return;
   } 
-  if (emailChecker) {
+  if (emailChecker(req.body.email, users)) {
     res.status(404).send("Sorry, no dice. That email already exists. Please try again.");
+    return;
   }
   const userRandomID = generateRandomString(4);
   const plainTextPassword = req.body.password;
@@ -82,14 +84,16 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  if (!emailChecker) {
+  if (!emailChecker(req.body.email, users)) {
     // console.log("email is:", req.body.email)
     res.status(403).send("Uh oh, there's a error. Please try again with a valid email!");
+    return;
   } 
-  const user = emailChecker;
+  const user = emailChecker(req.body.email, users);
   // console.log("the user's password is:", user.password);
   if (!bcrypt.compareSync(req.body.password, user.password)) {
     res.status(403).send("Sorry, no dice. That password is incorrect. Please try again.");
+    return;
   }
   // console.log("the login user is: ", user)
   req.session.user_id = user.id;
@@ -103,10 +107,11 @@ app.post('/logout', (req, res) => {
 
 const urlsForUser = function(urlDatabase, id) {
   let userSpecificURLDatabase = {};
+  console.log("the urlDatabase is: ", urlDatabase);
   for (const shortURL in urlDatabase) {
     // console.log("the shortURL is: ", shortURL);
     // console.log("the url db userid is: ", urlDatabase[shortURL].userID)
-    // console.log("this is id: ", id);
+    console.log("this is id: ", id);
     if (urlDatabase[shortURL].userID === id) {
       userSpecificURLDatabase[shortURL] = urlDatabase[shortURL];
       // console.log("the user specific db key is:" ,userSpecificURLDatabase[shortURL]);
@@ -121,6 +126,7 @@ app.get("/urls", (req, res) => {
   // console.log("the user id value is: ", user.id)
   if (!user) {
     res.send("Access denied to the URLs page. Please Login or Register use the TinyApp.");
+    return;
   }
   const userSpecificURLDatabase = (urlsForUser(urlDatabase, user.id));
   // console.log("this is userSpecificURLDatabase", userSpecificURLDatabase)
@@ -171,15 +177,16 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:shortURL", (req, res) => {
   const user = users[req.session["user_id"]];
   const userSpecificURLDatabase = urlsForUser(urlDatabase, user.id);
-  // console.log("the user is: ", user);
-  // console.log("the user id is: ", user.id);
-  // console.log("this is userSpecificURLDatabase", userSpecificURLDatabase);
+  console.log("the user is: ", user);
+  console.log("the user id is: ", user.id);
+  console.log("this is userSpecificURLDatabase", userSpecificURLDatabase);
   for (const shortURL in userSpecificURLDatabase) {
     if (user.id === userSpecificURLDatabase[shortURL].userID) {
-      // console.log("the id in the userSpecificURLDatabase is: ", userSpecificURLDatabase[shortURL].userID);
       const shortURL = req.params.shortURL;
+      console.log("shortURL is ", shortURL);
       const updatedlongURL = req.body.longURL;
       urlDatabase[shortURL].longURL = updatedlongURL;
+      // console.log("the id in the userSpecificURLDatabase is: ", userSpecificURLDatabase[shortURL].userID);
       res.redirect('/urls');
     }
   }
