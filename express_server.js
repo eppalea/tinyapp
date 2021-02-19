@@ -41,7 +41,7 @@ const urlDatabase = {
 };
 
 app.get("/", (req, res) => {
-  res.redirect("/register")
+  res.redirect("/register");
 });
 
 app.get("/register", (req, res) => {
@@ -58,7 +58,7 @@ app.post("/register", (req, res) => {
     // console.log("email is:", req.body.email)
     res.status(404).send("Uh oh, there's a error. Please try again with a valid email or password!");
     return;
-  } 
+  }
   if (emailChecker(req.body.email, users)) {
     res.status(404).send("Sorry, no dice. That email already exists. Please try again.");
     return;
@@ -72,6 +72,7 @@ app.post("/register", (req, res) => {
     password: hash
   };
   // console.log("the users:", users);
+  // console.log("req.session userRandomID is: ", userRandomID);
   req.session.user_id = userRandomID;
   res.redirect('/urls');
 });
@@ -88,7 +89,7 @@ app.post('/login', (req, res) => {
     // console.log("email is:", req.body.email)
     res.status(403).send("Uh oh, there's a error. Please try again with a valid email!");
     return;
-  } 
+  }
   const user = emailChecker(req.body.email, users);
   // console.log("the user's password is:", user.password);
   if (!bcrypt.compareSync(req.body.password, user.password)) {
@@ -111,7 +112,7 @@ const urlsForUser = function(urlDatabase, id) {
   for (const shortURL in urlDatabase) {
     // console.log("the shortURL is: ", shortURL);
     // console.log("the url db userid is: ", urlDatabase[shortURL].userID)
-    console.log("this is id: ", id);
+    // console.log("this is id: ", id);
     if (urlDatabase[shortURL].userID === id) {
       userSpecificURLDatabase[shortURL] = urlDatabase[shortURL];
       // console.log("the user specific db key is:" ,userSpecificURLDatabase[shortURL]);
@@ -197,9 +198,9 @@ app.post("/urls/:shortURL", (req, res) => {
 app.post('/urls/:shortURL/delete', (req, res) => {
   const user = users[req.session["user_id"]];
   const userSpecificURLDatabase = urlsForUser(urlDatabase, user.id);
-  console.log("the user is: ", user);
-  console.log("the user id is: ", user.id);
-  console.log("this is userSpecificURLDatabase", userSpecificURLDatabase);
+  // console.log("the user is: ", user);
+  // console.log("the user id is: ", user.id);
+  // console.log("this is userSpecificURLDatabase", userSpecificURLDatabase);
   for (const shortURL in userSpecificURLDatabase) {
     if (user.id === userSpecificURLDatabase[shortURL].userID) {
     // console.log("the id in the userSpecificURLDatabase is: ", userSpecificURLDatabase[shortURL].userID);
