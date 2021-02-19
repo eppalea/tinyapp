@@ -47,7 +47,7 @@ app.post("/register", (req, res) => {
     // console.log("email is:", req.body.email)
     res.status(404).send("Uh oh, there's a error. Please try again with a valid email!");
   } 
-  if (emailChecker(req.body.email)) {
+  if (emailChecker) {
     res.status(404).send("Sorry, no dice. That email already exists. Please try again.");
   }
   const userRandomID = generateRandomString(4);
@@ -71,11 +71,11 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  if (!emailChecker(req.body.email)) {
+  if (!emailChecker) {
     // console.log("email is:", req.body.email)
     res.status(403).send("Uh oh, there's a error. Please try again with a valid email!");
   } 
-  const user = emailChecker(req.body.email);
+  const user = emailChecker;
   // console.log("the user's password is:", user.password);
   if (!bcrypt.compareSync(req.body.password, user.password)) {
     res.status(403).send("Sorry, no dice. That password is incorrect. Please try again.");
@@ -164,13 +164,14 @@ app.post("/urls/:shortURL", (req, res) => {
   // console.log("the user id is: ", user.id);
   // console.log("this is userSpecificURLDatabase", userSpecificURLDatabase);
   for (const shortURL in userSpecificURLDatabase) {
-    if (user.id === userSpecificURLDatabase[shortURL].userID)
-      console.log("the id i÷n the userSpecificURLDatabase is: ", userSpecificURLDatabase[shortURL].userID);
+    if (user.id === userSpecificURLDatabase[shortURL].userID) {
+      // console.log("the id in the userSpecificURLDatabase is: ", userSpecificURLDatabase[shortURL].userID);
+      const shortURL = req.params.shortURL;
+      const updatedlongURL = req.body.longURL;
+      urlDatabase[shortURL].longURL = updatedlongURL;
+      res.redirect('/urls');
+    }
   }
-  const shortURL = req.params.shortURL;
-  const updatedlongURL = req.body.longURL;
-  urlDatabase[shortURL].longURL = updatedlongURL;
-  res.redirect('/urls');
 });
 
 
