@@ -2,7 +2,7 @@ const express = require("express");
 const app = express(); //app could be named server
 const PORT = 8080;
 
-const emailChecker = require('./helpers');
+const { emailChecker } = require('./helpers');
 
 const cookieSession = require('cookie-session');
 app.use(cookieSession({
@@ -56,7 +56,7 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   if (!req.body.email) {
     // console.log("email is:", req.body.email)
-    res.status(404).send("Uh oh, there's a error. Please try again with a valid email!");
+    res.status(404).send("Uh oh, there's a error. Please try again with a valid email or password!");
     return;
   } 
   if (emailChecker(req.body.email, users)) {
@@ -101,8 +101,8 @@ app.post('/login', (req, res) => {
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie("user_id");
-  res.redirect("/login");
+  req.session = null;
+  res.redirect("/urls");
 });
 
 const urlsForUser = function(urlDatabase, id) {
@@ -177,13 +177,13 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:shortURL", (req, res) => {
   const user = users[req.session["user_id"]];
   const userSpecificURLDatabase = urlsForUser(urlDatabase, user.id);
-  console.log("the user is: ", user);
-  console.log("the user id is: ", user.id);
-  console.log("this is userSpecificURLDatabase", userSpecificURLDatabase);
+  // console.log("the user is: ", user);
+  // console.log("the user id is: ", user.id);
+  // console.log("this is userSpecificURLDatabase", userSpecificURLDatabase);
   for (const shortURL in userSpecificURLDatabase) {
     if (user.id === userSpecificURLDatabase[shortURL].userID) {
       const shortURL = req.params.shortURL;
-      console.log("shortURL is ", shortURL);
+      // console.log("shortURL is ", shortURL);
       const updatedlongURL = req.body.longURL;
       urlDatabase[shortURL].longURL = updatedlongURL;
       // console.log("the id in the userSpecificURLDatabase is: ", userSpecificURLDatabase[shortURL].userID);
@@ -197,9 +197,9 @@ app.post("/urls/:shortURL", (req, res) => {
 app.post('/urls/:shortURL/delete', (req, res) => {
   const user = users[req.session["user_id"]];
   const userSpecificURLDatabase = urlsForUser(urlDatabase, user.id);
-  // console.log("the user is: ", user);
-  // console.log("the user id is: ", user.id);
-  // console.log("this is userSpecificURLDatabase", userSpecificURLDatabase);
+  console.log("the user is: ", user);
+  console.log("the user id is: ", user.id);
+  console.log("this is userSpecificURLDatabase", userSpecificURLDatabase);
   for (const shortURL in userSpecificURLDatabase) {
     if (user.id === userSpecificURLDatabase[shortURL].userID) {
     // console.log("the id in the userSpecificURLDatabase is: ", userSpecificURLDatabase[shortURL].userID);
